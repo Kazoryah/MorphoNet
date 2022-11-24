@@ -44,8 +44,8 @@ class DataModule(
     class Standardizer:  # pylint: disable=too-few-public-methods
         """Classic ZScore standardizer needing mean and std from train dataset."""
         def __init__(self, data_module: "DataModule", train_data: torch.Tensor) -> None:
-            self.mean = torch.mean(train_data)
-            self.std = torch.std(train_data)
+            self.mean = torch.mean(train_data).item()
+            self.std = torch.std(train_data).item()
             self.active = data_module.standardize
 
             if mlflow.active_run() is not None:

@@ -68,10 +68,11 @@ class Parser(argparse.ArgumentParser):
             help="Validation split",
         )
         self.add_argument(
-            "--standardize",
-            type=bool,
+            "--no-std",
+            action="store_false",
             default=True,
-            help="Method to use to standardize data.",
+            dest="standardize",
+            help="Do not standardize data.",
         )
 
         self.add_argument(
