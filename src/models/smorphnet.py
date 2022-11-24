@@ -183,3 +183,34 @@ class SMorphNetWTH(BaseNetwork, metaclass=NotTested):
         batch = self.sb1(batch)
 
         return batch
+
+
+class SMorphNetNoSB(BaseNetwork):
+    """Network with only one SMorph layer (no scale bias layer)."""
+
+    def __init__(
+        self,
+        filter_size: int,
+        loss_function: Callable,
+        **kwargs: Any,
+    ):
+        super().__init__(loss_function=loss_function)
+        self._set_hparams(
+            {
+                "filter_size": filter_size,
+                "loss_function": loss_function,
+                **kwargs,
+            }
+        )
+
+        self.sm1 = SMorph(
+            in_channels=1, out_channels=1, filter_size=filter_size, **kwargs
+        )
+
+    def forward(
+        self, batch: torch.Tensor, *args: Any, **kwargs: Any
+    ) -> torch.Tensor:
+        # pylint: disable=arguments-differ
+        batch = self.sm1(batch)
+
+        return batch
