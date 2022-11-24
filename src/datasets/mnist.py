@@ -20,21 +20,26 @@ class MNIST(DataModule):
             self.dataset_path,
             train=True,
         )
-        inputs_scaled = self.scale(train_dataset.data)
+        normalized_inputs = self.normalize(train_dataset.data)
         inputs, targets = self.remodel_data(
-            inputs_scaled, train_dataset.targets
+            normalized_inputs, train_dataset.targets
         )
 
+        self.standardizer = self.Standardizer(self, inputs)
+        standardized_inputs = self.standardizer(inputs)
+
         self.train_dataset = Dataset(
-            inputs=self.normalize(inputs),
+            inputs=standardized_inputs,
             targets=targets,
         )
 
         val_dataset = torchvision.datasets.MNIST(self.dataset_path, train=False)
-        inputs_scaled = self.scale(val_dataset.data)
-        inputs, targets = self.remodel_data(inputs_scaled, val_dataset.targets)
+        normalized_inputs = self.normalize(val_dataset.data)
+        inputs, targets = self.remodel_data(normalized_inputs, val_dataset.targets)
+
+        standardized_inputs = self.standardizer(inputs)
 
         self.val_dataset = Dataset(
-            inputs=self.normalize(inputs),
+            inputs=standardized_inputs,
             targets=targets,
         )

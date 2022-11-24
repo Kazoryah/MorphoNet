@@ -1,8 +1,10 @@
 # pylint: disable=all
 # type: ignore
 
+from .base import DataModule
+
 # TODO not reimplemented
-class SIDDDataset(Dataset):  # pragma: no cover
+class SIDD(DataModule):  # pragma: no cover
     # https://paperswithcode.com/dataset/sidd
 
     def __init__(
@@ -95,3 +97,39 @@ class SIDDDataset(Dataset):  # pragma: no cover
             return io.imread(image_path.format(instance["path"]))
 
         return [load_instance(instance) for instance in instances]
+
+    def add_specific_arguments(cls, parser: ArgumentParser) -> None:
+        parser.add_argument(
+            "dataset_path", nargs=1, help="dataset to train on"
+        )
+        parser.add_argument(
+            "--patch_size",
+            type=int,
+            default=64,
+            help="width and height of the image patches",
+        )
+        parser.add_argument(
+            "--smartphone_codes",
+            default=None,
+            help="which smartphone codes to use from the dataset (comma-separated)",
+        )
+        parser.add_argument(
+            "--iso_levels",
+            default=None,
+            help="which iso levels to use from the dataset (comma-separated)",
+        )
+        parser.add_argument(
+            "--shutter_speeds",
+            default=None,
+            help="which shutter speeds to use from the dataset (comma-separated)",
+        )
+        parser.add_argument(
+            "--illuminants",
+            default=None,
+            help="which illuminants to use from the dataset (comma-separated)",
+        )
+        parser.add_argument(
+            "--ibcs",
+            default=None,
+            help="which illuminant brightness codes to use from the dataset (comma-separated)",
+        )

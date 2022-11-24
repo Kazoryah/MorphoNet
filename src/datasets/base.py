@@ -2,13 +2,13 @@
 
 from abc import abstractmethod, ABCMeta
 from typing import Any, List, Optional, Tuple, Type
-
 import inspect
-import pytorch_lightning as pl
 
-import torchvision
+from argparse import ArgumentParser
+import pytorch_lightning as pl
 import torch
 from torch.utils.data import DataLoader
+import mlflow
 
 from misc.utils import PRECISIONS_NP, PRECISIONS_TORCH
 from operations.base import Operation
@@ -41,12 +41,32 @@ class DataModule(
 ):  # pylint: disable=too-many-instance-attributes
     """Base abstract class for datasets."""
 
+    class Standardizer:  # pylint: disable=too-few-public-methods
+        """Classic ZScore standardizer needing mean and std from train dataset."""
+        def __init__(self, data_module: "DataModule", train_data: torch.Tensor) -> None:
+            self.mean = torch.mean(train_data)
+            self.std = torch.std(train_data)
+            self.active = data_module.standardize
+
+            if mlflow.active_run() is not None:
+                mlflow.log_param("train_dataset_mean", self.mean)
+                mlflow.log_param("train_dataset_std", self.std)
+
+        def __call__(self, data: torch.Tensor) -> torch.Tensor:
+            """Standardize data if wanted."""
+            if self.active:
+                return (data - self.mean) / self.std
+
+            return data
+
+
     def __init__(
         self,
         batch_size: int,
         dataset_path: str,
         precision: str,
         operation: Operation,
+        standardize: bool,
     ) -> None:
         super().__init__()
         self.batch_size = batch_size
@@ -55,21 +75,23 @@ class DataModule(
         self.np_precision = PRECISIONS_NP[precision]
         self.num_workers = 8
         self.operation = operation
+        self.standardize = standardize
 
+        self.standardizer: DataModule.Standardizer
         self.train_dataset: Dataset
         self.val_dataset: Dataset
 
-    def scale(self, tensor: torch.Tensor) -> torch.Tensor:
-        """Convert tensor to right precision and rescale it in [0; 1]."""
-        return torchvision.transforms.ConvertImageDtype(self.torch_precision)(
-            tensor
-        )
+    def normalize(self, tensor: torch.Tensor, min_value: Optional[float] = 0.0, max_value: Optional[float] = 255.0) -> torch.Tensor:
+        """
+        Convert tensor to right type and precision, then nomalize it in [0; 1].
+        """
+        tensor = tensor.to(self.torch_precision)
+        if min_value is None:
+            min_value = torch.min(tensor).item()
+        if max_value is None:
+            max_value = torch.max(tensor).item()
 
-    def normalize(self, tensor: torch.Tensor) -> torch.Tensor:
-        """Normalize the data."""
-        return torchvision.transforms.Lambda(
-            lambda x: (x - torch.mean(x)) / torch.std(x)
-        )(tensor)
+        return (tensor - min_value) / (max_value - min_value)
 
     def remodel_data(
         self, inputs: torch.Tensor, targets: torch.Tensor
@@ -155,3 +177,7 @@ class DataModule(
             subclasses = subclasses.union(subclass.listing())
 
         return list(subclasses)
+
+    @classmethod
+    def add_specific_arguments(cls, parser: ArgumentParser) -> None:
+        """Add specific arguments needed for the use of the dataset."""

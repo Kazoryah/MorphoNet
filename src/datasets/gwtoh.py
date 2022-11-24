@@ -1,8 +1,10 @@
 # pylint: disable=all
 # type: ignore
 
+from .base import DataModule
+
 # TODO not reimplemented/generated
-class BIWTOHDataset(Dataset):  # pragma: no cover
+class BIWTOH(Datamodule):  # pragma: no cover
     def __init__(self, precision, dataset_path, train=False, **kwargs):
         dtype = PRECISIONS_NP[precision]
 

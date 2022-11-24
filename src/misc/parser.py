@@ -61,11 +61,17 @@ class Parser(argparse.ArgumentParser):
         self.add_argument(
             "--batch_size", type=int, default=32, help="batch size"
         )
-        self.add_argument(
+        self.add_argument(  # TODO implement usage!
             "--validation_split",
             type=float,
             default=0.1,
-            help="validation split",
+            help="Validation split",
+        )
+        self.add_argument(
+            "--standardize",
+            type=bool,
+            default=True,
+            help="Method to use to standardize data.",
         )
 
         self.add_argument(
@@ -108,38 +114,4 @@ class Parser(argparse.ArgumentParser):
                 "dataset_path", help="dataset to train on"
             )
 
-        sidd_parser = subparsers.add_parser("sidd", help="Train on sidd")
-        sidd_parser.add_argument(
-            "dataset_path", nargs=1, help="dataset to train on"
-        )
-        sidd_parser.add_argument(
-            "--patch_size",
-            type=int,
-            default=64,
-            help="width and height of the image patches",
-        )
-        sidd_parser.add_argument(
-            "--smartphone_codes",
-            default=None,
-            help="which smartphone codes to use from the dataset (comma-separated)",
-        )
-        sidd_parser.add_argument(
-            "--iso_levels",
-            default=None,
-            help="which iso levels to use from the dataset (comma-separated)",
-        )
-        sidd_parser.add_argument(
-            "--shutter_speeds",
-            default=None,
-            help="which shutter speeds to use from the dataset (comma-separated)",
-        )
-        sidd_parser.add_argument(
-            "--illuminants",
-            default=None,
-            help="which illuminants to use from the dataset (comma-separated)",
-        )
-        sidd_parser.add_argument(
-            "--ibcs",
-            default=None,
-            help="which illuminant brightness codes to use from the dataset (comma-separated)",
-        )
+            class_.add_specific_arguments(dataset_parser)

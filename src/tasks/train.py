@@ -170,6 +170,7 @@ def main(args: Namespace, run: ActiveRun) -> None:
             batch_size=args.batch_size,
             precision=args.precision,
             operation=operation,
+            standardize=args.standardize,
         )
 
     (
