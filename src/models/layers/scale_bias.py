@@ -1,6 +1,6 @@
 """Layer implementing affine function."""
 
-from typing import Any, Optional
+from typing import Any, Optional, Tuple
 import torch
 from torch import nn
 
@@ -32,6 +32,7 @@ class ScaleBias(BaseLayer):
         target: Optional[np.ndarray] = None,
         comments: str = "",
         divider: Optional[AxesDivider] = None,
+        limits: Optional[Tuple[float, float]] = None,
     ) -> Axes:  # pragma: no cover
 
         axis.get_yaxis().set_ticks([])

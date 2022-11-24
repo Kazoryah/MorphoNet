@@ -1,6 +1,6 @@
 """Layer implementing the PConv function."""
 
-from typing import Any, Optional
+from typing import Any, Optional, Tuple
 from torch import nn
 from torch.nn import functional as F
 import torch
@@ -77,6 +77,7 @@ class PConv(BaseLayer):
         target: Optional[np.ndarray] = None,
         comments: str = "",
         divider: Optional[AxesDivider] = None,
+        limits: Optional[Tuple[float, float]] = None,
     ) -> Axes:  # pragma: no cover
         p = self.p.squeeze().detach().cpu()  # pylint: disable=invalid-name
 
