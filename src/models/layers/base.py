@@ -1,6 +1,6 @@
 """Base layer essentially to declare plots functions."""
 
-from typing import Optional, Tuple, Any
+from typing import Optional, Tuple, Any, List
 from matplotlib.axes._axes import Axes
 from matplotlib.figure import Figure
 import numpy as np
@@ -26,7 +26,7 @@ class BaseLayer(pl.LightningModule):
         target: Optional[np.ndarray] = None,
         comments: str = "",
         divider: Optional[AxesDivider] = None,
-        limits: Optional[Tuple[float, float]] = None,
+        limits: Optional[List[Tuple[float, float]]] = None,
     ) -> Axes:  # pragma: no cover
         """
         Method specific to each layer that plots its visualization.
@@ -41,7 +41,7 @@ class BaseLayer(pl.LightningModule):
         target: Optional[np.ndarray] = None,
         comments: str = "",
         divider: Optional[AxesDivider] = None,
-        limits: Optional[Tuple[float, float]] = None,
+        limits: Optional[List[Tuple[float, float]]] = None,
     ) -> None:  # pragma: no cover
         """
         Function calling implemented `plot_` method while managing figure and

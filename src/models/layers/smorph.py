@@ -1,6 +1,6 @@
 """Layer implementing the SMorph function."""
 
-from typing import Any, Optional, Tuple
+from typing import Any, Optional, Tuple, List
 import torch
 from torch import nn
 import matplotlib.pyplot as plt
@@ -76,7 +76,7 @@ class SMorph(BaseLayer):
         target: Optional[np.ndarray] = None,
         comments: str = "",
         divider: Optional[AxesDivider] = None,
-        limits: Optional[Tuple[float, float]] = None,
+        limits: Optional[List[Tuple[float, float]]] = None,
     ) -> Axes:  # pragma: no cover
         alpha = self.alpha.squeeze().detach().cpu()
         if alpha < 0:
@@ -93,11 +93,11 @@ class SMorph(BaseLayer):
         filter_ = self.filter.squeeze().detach().cpu()
 
         plot = axis.pcolormesh(filter_, cmap=cmap)
-        if limits is not None:
+        if limits is not None and len(limits) >= 2:
             if alpha < 0:
-                plot.set_clim(vmax=limits[1])
+                plot.set_clim(limits[0])
             else:
-                plot.set_clim(vmax=limits[0])
+                plot.set_clim(limits[1])
         if divider is None:
             divider = make_axes_locatable(axis)
         clb_ax = divider.append_axes("right", size="5%", pad=0.05)
@@ -144,7 +144,7 @@ class SMorphTanh(SMorph):
         target: Optional[np.ndarray] = None,
         comments: str = "",
         divider: Optional[AxesDivider] = None,
-        limits: Optional[Tuple[float, float]] = None,
+        limits: Optional[List[Tuple[float, float]]] = None,
     ) -> Axes:  # pragma: no cover
         axis.invert_yaxis()
         axis.get_yaxis().set_ticks([])

@@ -1,6 +1,6 @@
 """Layer implementing the LMorph function."""
 
-from typing import Any, Optional, Tuple
+from typing import Any, Optional, Tuple, List
 from torch import nn
 import torch
 import matplotlib.pyplot as plt
@@ -82,7 +82,7 @@ class LMorph(BaseLayer):
         target: Optional[np.ndarray] = None,
         comments: str = "",
         divider: Optional[AxesDivider] = None,
-        limits: Optional[Tuple[float, float]] = None,
+        limits: Optional[List[Tuple[float, float]]] = None,
     ) -> Axes:  # pragma: no cover
         p = self.p.squeeze().detach().cpu()  # pylint: disable=invalid-name
         if p < 0:
