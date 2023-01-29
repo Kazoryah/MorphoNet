@@ -207,6 +207,7 @@ def plot_submodules_(
     inputs: torch.Tensor,
     structuring_element: str,
     excluded: Optional[List[str]],
+    limits: Optional[List[Tuple[float, float]]] = None,
 ) -> None:
     """Plot each modules of the network."""
     target_structuring_element = recreate_target_selem(
@@ -239,6 +240,7 @@ def plot_submodules_(
                 target=target_structuring_element,
                 comments=comments,
                 divider=divider,
+                limits=limits,
             )
             plot_index += 1
         except NotImplementedError:
@@ -254,6 +256,7 @@ def plot(  # pylint: disable=too-many-locals,too-many-arguments,unused-argument
     iterations: List[int],
     stretch_x: int = 1,
     excluded: Optional[List[str]] = None,
+    limits: Optional[List[Tuple[float, float]]] = None,
 ) -> None:
     """
     Plot an entire figure with the results for desired models, structuring
@@ -317,6 +320,7 @@ def plot(  # pylint: disable=too-many-locals,too-many-arguments,unused-argument
                 inputs,
                 structuring_element,
                 excluded,
+                limits,
             )
 
         plt.show()
