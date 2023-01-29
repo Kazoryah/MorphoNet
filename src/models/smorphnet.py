@@ -42,7 +42,7 @@ class SMorphNet(BaseNetwork):
         return batch
 
 
-class SMorphNetTanh(SMorphNet):
+class SMorphNetTanh(BaseNetwork):
     """Network with one SMorphTanh layer."""
 
     def __init__(
@@ -51,11 +51,68 @@ class SMorphNetTanh(SMorphNet):
         loss_function: Callable,
         **kwargs: Any,
     ):
-        super().__init__(filter_size=filter_size, loss_function=loss_function)
+        super().__init__(loss_function=loss_function)
+        self._set_hparams(
+            {
+                "filter_size": filter_size,
+                "loss_function": loss_function,
+                **kwargs,
+            }
+        )
+
         self.sm1 = SMorphTanh(
             in_channels=1, out_channels=1, filter_size=filter_size, **kwargs
         )
         self.sb1 = ScaleBias(num_features=1, **kwargs)
+
+    def forward(
+        self, batch: torch.Tensor, *args: Any, **kwargs: Any
+    ) -> torch.Tensor:
+        # pylint: disable=arguments-differ
+        batch = self.sm1(batch)
+        batch = self.sb1(batch)
+
+        return batch
+
+
+class SMorphNetTanhDouble(BaseNetwork):
+    """Network with two SMorphTanh layers."""
+
+    def __init__(
+        self,
+        filter_size: int,
+        loss_function: Callable,
+        **kwargs: Any,
+    ):
+        super().__init__(loss_function=loss_function)
+        self._set_hparams(
+            {
+                "filter_size": filter_size,
+                "loss_function": loss_function,
+                **kwargs,
+            }
+        )
+
+        self.sm1 = SMorphTanh(
+            in_channels=1, out_channels=1, filter_size=filter_size, **kwargs
+        )
+        self.sm2 = SMorphTanh(
+            in_channels=1, out_channels=1, filter_size=filter_size, **kwargs
+        )
+        self.sb1 = ScaleBias(num_features=1, **kwargs)
+
+    def forward(
+        self, batch: torch.Tensor, *args: Any, **kwargs: Any
+    ) -> torch.Tensor:
+        # pylint: disable=arguments-differ
+        batch = self.sm1(batch)
+        batch = self.sm2(batch)
+        batch = self.sb1(batch)
+
+        return batch
+
+
+
 
 
 class SMorphNetDouble(BaseNetwork):
@@ -212,5 +269,75 @@ class SMorphNetNoSB(BaseNetwork):
     ) -> torch.Tensor:
         # pylint: disable=arguments-differ
         batch = self.sm1(batch)
+
+        return batch
+
+
+class SMorphNetDoubleNoSB(BaseNetwork):
+    """Network with only two SMorph layers (no scale bias layer)."""
+
+    def __init__(
+        self,
+        filter_size: int,
+        loss_function: Callable,
+        **kwargs: Any,
+    ):
+        super().__init__(loss_function=loss_function)
+        self._set_hparams(
+            {
+                "filter_size": filter_size,
+                "loss_function": loss_function,
+                **kwargs,
+            }
+        )
+
+        self.sm1 = SMorph(
+            in_channels=1, out_channels=1, filter_size=filter_size, **kwargs
+        )
+        self.sm2 = SMorph(
+            in_channels=1, out_channels=1, filter_size=filter_size, **kwargs
+        )
+
+    def forward(
+        self, batch: torch.Tensor, *args: Any, **kwargs: Any
+    ) -> torch.Tensor:
+        # pylint: disable=arguments-differ
+        batch = self.sm1(batch)
+        batch = self.sm2(batch)
+
+        return batch
+
+
+class SMorphNetTanhDoubleNoSB(BaseNetwork):
+    """Network with only two SMorphTanh layers."""
+
+    def __init__(
+        self,
+        filter_size: int,
+        loss_function: Callable,
+        **kwargs: Any,
+    ):
+        super().__init__(loss_function=loss_function)
+        self._set_hparams(
+            {
+                "filter_size": filter_size,
+                "loss_function": loss_function,
+                **kwargs,
+            }
+        )
+
+        self.sm1 = SMorphTanh(
+            in_channels=1, out_channels=1, filter_size=filter_size, **kwargs
+        )
+        self.sm2 = SMorphTanh(
+            in_channels=1, out_channels=1, filter_size=filter_size, **kwargs
+        )
+
+    def forward(
+        self, batch: torch.Tensor, *args: Any, **kwargs: Any
+    ) -> torch.Tensor:
+        # pylint: disable=arguments-differ
+        batch = self.sm1(batch)
+        batch = self.sm2(batch)
 
         return batch
